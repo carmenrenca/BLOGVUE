@@ -10,6 +10,6 @@ mongoose.connect('mongodb://localhost:27017/api_rest_blog',{useNewUrlParser: tru
 console.log('conexion a la base de datos se ha realizado con exito!!!');
 //crear servidor y ponerme a escuchar peticiones http
 app.listen(port, ()=>{
-    console.log('Sevidor corriendo en http://localhost:'+port)
+    console.log('Sevidor corriendo en http://localhost:'+port);
 })
 });

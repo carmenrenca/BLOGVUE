@@ -9,27 +9,35 @@ var bodyParser =require('body-parser');
 var app = express();
 
 //Cargar ficheros rutas
-
+var article_router = require('./routes/article');
 
 //Midelwares
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
+
+
 //CORS
 
 
-// Añadir prefijos a rutas 
+// Añadir prefijos a rutas /cargar rutas
+app.use('/api',article_router);
+
 
 //rutas o metodo de prueba para el API REST
-
-app.get('/probando', (req, res)=>{
-return res.status(404).send({
+/*
+app.post('/probando', (req, res)=>{
+    var hola = req.body.hola;
+  
+return res.status(200).send({
     curso: 'Master en Framenworks JS',
     autor: 'carmen Rendon WEB',
-    URL:'carmenrendon.es'
+    URL:'carmenrendon.es',
+    hola
+
 });
-});
+});*/
 
 //Exportar modulo(fichero actual)
 
