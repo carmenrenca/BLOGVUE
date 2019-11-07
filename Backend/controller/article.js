@@ -25,7 +25,7 @@ var controller= {
         });
     },
 
-    //crear un nuevo articulo
+    //CREAR NUEVO ARTICULO
 
     save: (req, res)=>{
 
@@ -34,7 +34,7 @@ var controller= {
                
             console.log(params);
      
-        //validar datos(validator)
+        //VALIDAR DATOS
             try{
                 var validateTitle= !validator.isEmpty(params.title);
                 var validate_cotent= !validator.isEmpty(params.content);
@@ -56,6 +56,8 @@ var controller= {
 
         //guardar el articulo
                 article.save((err, articleStore)=>{
+
+
                     if(err || !articleStore){
                         return res.status(404).send({
                             status:'error',
@@ -65,10 +67,10 @@ var controller= {
 
                 });
         //devolver una respuesta
-        return res.status(200).send({
-            status:'success',
-            article
-        }); 
+                    return res.status(200).send({
+                        status:'success',
+                        article: articleStore
+                    }); 
             }else{
                 return res.status(200).send({
                     status: 'error',
@@ -76,7 +78,181 @@ var controller= {
                 });  
             }
       
-    }
+    }, 
+
+    //SACAR TODOS LOS ARTÍCULOS
+
+    getArticles: (req, res)=>{
+
+        var query = Article.find({});
+
+        var last = req.params.last;
+        
+        if(last || last!=undefined){
+                query.limit(2);
+        }
+   
+            //Find sacar los datos de la bd
+            query.sort('-id').exec((err,articles)=>{
+
+                if(err){
+                    return res.status(500).send({
+                        status:'error',
+                        message:'Error  al  devolver los articulos!!'
+                    })
+                }
+        
+                if(!articles){
+                    return res.status(404).send({
+                        status:'error',
+                        message:'No hay articulos para mostrar!!'
+                    })
+                }
+
+                return res.status(200).send({
+                    status: 'success',
+                    articles
+                });  
+            });
+
+      
+    },
+
+        getArticle: (req, res)=>{
+
+            //recoger el id de la URL
+
+                var articleId =req.params.id;
+
+            //comprobar que existe
+                if(!articleId || articleId == null){
+                    return res.status(404).send({
+                        status:'error',
+                        message:'No existe el articulo!!'
+                    });
+                }
+                
+            //buscar el articulo
+                Article.findById(articleId, (err,article)=>{
+                      
+                        if(err || !article){
+                            return res.status(404).send({
+                                status:'error',
+                                message:'No existe el articulos!!'
+                            });
+                        }
+                        return res.status(200).send({
+                            status: 'success',
+                           article
+                        }); 
+                });
+            //Devolver en json
+           
+        },
+
+        //EDITAR ARTICULOS
+
+        update: (req, res) =>{
+
+            //Recoger el ID del articulo por la URL
+
+            var articleId = req.params.id;
+
+
+            //Regoger los datos que llegan por put 
+                var params = req.body;
+
+            //Validar datos
+
+                try{
+                        var validate_title = !validator.isEmpty(params.title);
+                        var validate_content = !validator.isEmpty(params.content);
+                         
+                }catch(err){
+
+                    return res.status(200).send({
+                        status:'error',
+                    message:'Faltan datos por enviar!!'
+                    });
+                  
+                }
+
+                    if(validate_title && validate_content){
+                            //Find and Update
+
+                            Article.findOneAndUpdate({_id:articleId}, params,{new:true},(err,articleUpdate)=>{
+                                    if(err){
+                                        return res.status(500).send({
+                                            status: 'error',
+                                            message:'Error al actualizar'
+                                        });  
+                                    }
+
+
+                                    if(!articleUpdate){
+                                        return res.status(404).send({
+                                            status: 'error',
+                                            message:'No existe el articulos!!'
+                                        });  
+                                    }
+                                        return res.status(404).send({
+                                            status: 'success',
+                                            article: articleUpdate    
+                                        });  
+                                    
+                            });
+                    }else{
+                        return res.status(200).send({
+                            status: 'error',
+                            message:'La validación no es correcta'
+                        });  
+                    }
+           
+
+            //devolver una respuesta
+
+            return res.status(200).send({
+                status: 'success',
+                message:'prueba!!'
+            });  
+        },
+
+        //ELIMINAR ARTICULO
+
+        delete: (req, res)=>{
+
+
+            //RECOGER EL ID DEL LA URL
+                var articleId= req.params.id;
+                
+            //fing and delete
+
+            Article.findOneAndDelete({_id: articleId},(err,articleremove)=>{
+                if(err){
+                    return res.status(500).send({
+                        status: 'error',
+                        message:'Error al eliminar'
+                    });  
+                }
+                if(!articleremove){
+                    return res.status(404).send({
+                        status: 'error',
+                        message:'No existe el articulo!!'
+                    });  
+                }
+                return res.status(200).send({
+                    status: 'succes',
+                   article: articleremove
+                }); 
+
+            });
+
+       
+            
+        }
+
+
+
 }; //end controller
 
 module.exports= controller;
