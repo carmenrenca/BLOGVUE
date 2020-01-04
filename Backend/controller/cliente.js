@@ -3,12 +3,16 @@ var Cliente = require('../models/cliente');
 var fs = require('fs');
 var path = require('path');
 
+const User = require('../models/user')
+const service = require('../services')
+
 var controller = {
 
     datosCurso: (req, res) => {
 
 
         return res.status(200).send({
+            status:'success',
             curso: 'Estoy en cliente',
             autor: 'carmen Rendon WEB',
             URL: 'carmenrendon.es',
@@ -19,13 +23,16 @@ var controller = {
 
     },
 
+
+      
     //CREAR NUEVO CLIENTE
 
     save: (req, res) => {
 
         //recoger parametros por post 
         var params = req.body;
-
+        var validate_email = !validator.isEmpty(params.email);
+        var validate_password = !validator.isEmpty(params.password);
         console.log(params);
 
         //VALIDAR DATOS
@@ -36,14 +43,16 @@ var controller = {
             var validate_direccion = !validator.isEmpty(params.direccion);
             var validate_email = !validator.isEmpty(params.email);
             var validate_dni = !validator.isEmpty(params.dni);
+            var validate_password = !validator.isEmpty(params.password);
         } catch (err) {
-            status: 'error'
+          
             return res.status(200).send({
+                status: 'error',
                 message: 'Faltan datos por enviar!!'
             });
         }
 
-        if (validateNombre && validate_dni && validate_apellido && validate_telefono && validate_direccion && validate_email) {
+        if (validateNombre && validate_password && validate_dni && validate_apellido && validate_telefono && validate_direccion && validate_email) {
             //crear el objeto a guardar
             var cliente = new Cliente();
             cliente.nombre = params.nombre;
@@ -52,6 +61,7 @@ var controller = {
             cliente.telefono = params.telefono;
             cliente.email = params.email;
             cliente.dni = params.dni;
+            cliente.password= params.password;
 
 
 
@@ -159,7 +169,7 @@ var controller = {
     },
     search: (req, res) => {
 
-        //SACAR EL STRING A BUSCAR
+           //SACAR EL STRING A BUSCAR
 
         var searchstring = req.params.search;
 
@@ -200,7 +210,8 @@ var controller = {
 
 
 
-    }
+    },
+
 
 
 }//end controller

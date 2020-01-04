@@ -11,6 +11,7 @@ var app = express();
 //Cargar ficheros rutas
 var article_router = require('./routes/article');
 var article_cliente = require('./routes/cliente');
+
 //Midelwares
 
 app.use(bodyParser.urlencoded({extended:false}));

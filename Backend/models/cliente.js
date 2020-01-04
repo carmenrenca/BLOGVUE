@@ -8,7 +8,8 @@ apellido: String,
 telefono:Number,
 direccion: String,
 email:String,
-dni:String
+dni:String,
+password:String
 });
 
 module.exports = mongoose.model('Cliente',Clientechema);
