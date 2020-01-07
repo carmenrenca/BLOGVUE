@@ -54,6 +54,7 @@ var controller = {
             article.content = params.content;
 
             article.imagen = null;
+            article.spotify=params.spotify;
             //asignar valores
 
             //guardar el articulo

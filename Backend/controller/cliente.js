@@ -1,9 +1,9 @@
 var validator = require('validator');
 var Cliente = require('../models/cliente');
+const User = require('../models/user')
 var fs = require('fs');
 var path = require('path');
 
-const User = require('../models/user')
 const service = require('../services')
 
 var controller = {
@@ -100,7 +100,7 @@ var controller = {
 
     getClientes: (req, res) => {
 
-        var query = Cliente.find({});
+        var query = User.find({});
 
         var last = req.params.last;
 
@@ -133,7 +133,38 @@ var controller = {
 
 
     },
+    getCliente: (req, res) => {
 
+        //recoger el id de la URL
+
+        var clienteId = req.params.id;
+console.log(clienteId+"IDD")
+        //comprobar que existe
+        if (!clienteId || clienteId == null) {
+            return res.status(404).send({
+                status: 'error',
+                message: 'No existe el cliente!!'
+            });
+        }
+
+        //buscar el articulo
+        User.findById(clienteId, (err, cliente) => {
+
+            if (err || !cliente) {
+                return res.status(404).send({
+                    status: 'error',
+                    message: 'No existe el cliente!!'
+                });
+            }
+            return res.status(200).send({
+                status: 'success',
+                cliente
+            
+            });
+        });
+        //Devolver en json
+
+    },
     //ELIMINAR ARTICULO
 
     delete: (req, res) => {
@@ -144,7 +175,7 @@ var controller = {
 
         //fing and delete
 
-        Cliente.findOneAndDelete({ _id: clienteId }, (err, clienteremove) => {
+        User.findOneAndDelete({ _id: clienteId }, (err, clienteremove) => {
             if (err) {
                 return res.status(500).send({
                     status: 'error',

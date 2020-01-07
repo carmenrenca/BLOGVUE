@@ -14,9 +14,10 @@ var multipart = require('connect-multiparty');
 
 router.get('/cliente/datos-curso',auth, ClienteController.datosCurso);
 router.post('/cliente/save', ClienteController.save);
-router.get('/clientes/:last?', auth, ClienteController.getClientes);
+router.get('/clientes/:last?',  ClienteController.getClientes);
 router.delete('/clientes-delete/:id', ClienteController.delete);
 router.get('/cliente-search/:search', ClienteController.search);
+router.get('/cliente/:id', ClienteController.getCliente);
 router.post('/signup', userCtrl.signUp)
 router.post('/signin', userCtrl.signIn)
 router.post('/getClientes', userCtrl.getsesiones)

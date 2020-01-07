@@ -8,7 +8,8 @@ content: String,
 date : {type:Date, default: Date.now},
 imagen: String,
 precio:String,
-Stock:Number
+Stock:Number,
+spotify:String
 });
 
 module.exports = mongoose.model('Article',ArticleSchema);
