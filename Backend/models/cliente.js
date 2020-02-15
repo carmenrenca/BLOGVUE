@@ -9,7 +9,8 @@ telefono:Number,
 direccion: String,
 email:String,
 dni:String,
-password:String
+password:String,
+rol:String
 });
 
-module.exports = mongoose.model('Cliente',Clientechema);
+module.exports = mongoose.model('users',Clientechema);

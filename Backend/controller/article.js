@@ -3,7 +3,8 @@ var validator = require('validator');
 var Article = require('../models/articles');
 var fs = require('fs');
 var path = require('path');
-
+var Categoria= require('../models/categoria')
+var index = require('../services/index');
 var controller = {
 
     datosCurso: (req, res) => {
@@ -16,6 +17,29 @@ var controller = {
             hola
 
         });
+
+
+    },
+
+    decotoken: (req, res) => {
+
+        try{
+            var token = req.params.token;
+            var tokendeco =index.decodeToken(token);
+            return res.status(200).send({
+                curso: 'token deco',
+              tokendeco
+    
+            });
+        }catch(err){
+            return res.status(500).send({
+                curso: 'error al devolver el token decodificado',
+             
+                tokendeco
+    
+            });
+        }
+    
 
 
     },
@@ -54,7 +78,8 @@ var controller = {
             article.content = params.content;
 
             article.imagen = null;
-            article.spotify=params.spotify;
+            article.categoria=params.categoria;
+            article.stock=params.stock;
             //asignar valores
 
             //guardar el articulo
@@ -121,6 +146,7 @@ var controller = {
 
     },
 
+
     getArticle: (req, res) => {
 
         //recoger el id de la URL
@@ -153,6 +179,40 @@ var controller = {
 
     },
 
+
+    getArticleCategoria: (req, res) => {
+
+        //recoger el id de la URL
+
+        var categoria = req.params.categoria;
+console.log(categoria)
+        //comprobar que existe
+        if (!categoria || categoria == null) {
+            return res.status(404).send({
+                status: 'error',
+                message: 'No existe la categoria!!'
+            });
+        }
+     
+        //buscar el articulo
+        Article.find({"categoria":categoria}, (err, article) => {
+
+            if (err || !article) {
+                return res.status(404).send({
+                    status: 'error',
+                    message: 'No existe el articulos!!'
+                });
+            }else{
+                return res.status(200).send({
+                    status: 'success',
+                    article
+                });
+            }
+         
+        });
+        //Devolver en json
+
+    },
     //EDITAR ARTICULOS
 
     update: (req, res) => {
@@ -373,8 +433,172 @@ var controller = {
 
 
 
-    }
+    },
 
+    
+    searchCategoria: (req, res) => {
+
+        //SACAR EL STRING A BUSCAR
+
+        var searchstring = req.params.search;
+
+
+        //FIND OR
+        Article.find({
+            "$or": [
+                { "categoria": { "$regex": searchstring, "$options": "i" } },
+              
+
+            ]
+        }).sort([['date', 'descending']]).exec((err, articles) => {
+
+
+            if (err) {
+                return res.status(500).send({
+                    status: 'error',
+                    message: "Error en la petición!!!"
+
+                });
+            }
+            if (!articles || articles.length <= 0) {
+                return res.status(404).send({
+                    status: 'error',
+                    message: "No hay articulos para mostrar con tu busquedad!!"
+
+                });
+            }
+            return res.status(200).send({
+                status: 'success',
+                articles
+
+            });
+        })
+
+
+
+    },
+
+
+    
+    saveCategori: (req, res) => {
+
+        //recoger parametros por post 
+        var params = req.body;
+
+        console.log(params);
+
+        //VALIDAR DATOS
+        try {
+            var validateTitle = !validator.isEmpty(params.title);
+           
+        } catch (err) {
+            status: 'error'
+            return res.status(200).send({
+                message: 'Faltan datos por enviar!!'
+            });
+        }
+
+        if (validateTitle) {
+            //crear el objeto a guardar
+            var categoria = new Categoria();
+            categoria.title = params.title;
+            categoria.imagen = null;
+          categoria.artitulos=null;
+            //asignar valores
+
+            //guardar el articulo
+            categoria.save((err, categoriaStore) => {
+
+
+                if (err || !categoriaStore) {
+                    return res.status(404).send({
+                        status: 'error',
+                        message: 'La categoria no se ha guardado !!'
+                    })
+                }
+                //devolver una respuesta
+                return res.status(200).send({
+                    status: 'success',
+                    categoria: categoriaStore
+                });
+            });
+
+        } else {
+            return res.status(200).send({
+                status: 'error',
+                message: 'Los datos no son validos!!'
+            });
+        }
+
+    },
+
+    getCategoria: (req, res) => {
+
+        var query = Categoria.find({});
+
+        var last = req.params.last;
+
+        if (last || last != undefined) {
+            query.limit(5);
+        }
+
+        //Find sacar los datos de la bd
+        query.sort('-_id').exec((err, Categoria) => {
+
+            if (err) {
+                return res.status(500).send({
+                    status: 'error',
+                    message: 'Error  al  devolver la categoria!!'
+                })
+            }
+
+            if (!Categoria) {
+                return res.status(404).send({
+                    status: 'error',
+                    message: 'No hay categoria para mostrar!!'
+                })
+            }
+
+            return res.status(200).send({
+                status: 'success',
+                Categoria
+            });
+        });
+
+
+    },
+
+    deleteCategori: (req, res) => {
+
+
+        //RECOGER EL ID DEL LA URL
+        var categoriId = req.params.id;
+
+        //fing and delete
+
+        Categoria.findOneAndDelete({ _id: categoriId }, (err, categoriaremove) => {
+            if (err) {
+                return res.status(500).send({
+                    status: 'error',
+                    message: 'Error al eliminar'
+                });
+            }
+            if (!categoriaremove) {
+                return res.status(404).send({
+                    status: 'error',
+                    message: 'No existe la categoria!!'
+                });
+            }
+            return res.status(200).send({
+                status: 'succes',
+                categoria: categoriaremove
+            });
+
+        });
+
+
+
+    },
 }; //end controller
 
 module.exports = controller;

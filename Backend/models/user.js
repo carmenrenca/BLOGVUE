@@ -17,7 +17,7 @@ const UserSchema = new Schema({
   telefono: Number,
   direccion: String,
   dni: String,
-
+rol:String
 })
 
 UserSchema.pre('save', (next) => {
