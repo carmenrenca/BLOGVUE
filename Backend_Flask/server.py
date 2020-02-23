@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_jwt_extended import create_access_token
-
+from validate_email import validate_email
 app = Flask(__name__)
 
 app.config['MONGO_DBNAME'] = 'api_rest_blog'
@@ -34,25 +34,55 @@ def register():
     dni = request.get_json()['dni']
 
     password = bcrypt.generate_password_hash(
-        request.get_json()['password']).decode('utf-8')
-    created = datetime.utcnow()
+    request.get_json()['password']).decode('utf-8')
+    is_valid = validate_email(email,verify=True)
+    is_numerico= telefono.isdigit()
 
-    user_id = users.insert({
-        'nombre': nombre,
-        'apellido': apellido,
-        'email': email,
-        'password': password,
-        'rol': rol,
-        'telefono': telefono,
-        'direccion': direccion,
-        'dni': dni
-    })
 
-    new_user = users.find_one({'_id': user_id})
+    access_token = create_access_token(identity={
+                'nombre': nombre,
+                'apellido': apellido,
+                'email': email,
+                'password': password,
+                'rol': rol,
+                'telefono': telefono,
+                'direccion': direccion,
+                'dni': dni
+            })
+          
+    validDni=False
+    letraControl = dni[8]
+  
+    if dni[:8].isdigit() and  letraControl.isalpha():
+        validDni=True
+    if nombre =='' or apellido=='' or email=='' or rol=='' or password=='' or telefono=='' or direccion=='' or dni=='':
+        return jsonify({'result': 'Faltan datos por enviar'})
+    if is_valid== False:
 
-    result = {'email': new_user['email'] + ' registered'}
+        return jsonify({'result': 'El Email no es correcto'})
+    if is_numerico == False or len(telefono)!=9:
+         return jsonify({'result': 'El telefono no es correcto'})
+    if len(dni)!=9 or validDni==False:
+         return jsonify({'result': 'El DNI no es correcto'})
+        
 
-    return jsonify({'result': result})
+    else:
+        user_id = users.insert({
+                'nombre': nombre,
+                'apellido': apellido,
+                'email': email,
+                'password': password,
+                'rol': rol,
+                'telefono': telefono,
+                'direccion': direccion,
+                'dni': dni
+            })
+        new_user = users.find_one({'_id': user_id})
+
+        result = {'email': new_user['email'] + ' registered'}
+      
+        return  jsonify({"token": access_token})
+      
 
 
 @app.route('/users/login', methods=['POST'])

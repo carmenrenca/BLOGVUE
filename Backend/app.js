@@ -11,7 +11,7 @@ var app = express();
 //Cargar ficheros rutas
 var article_router = require('./routes/article');
 var article_cliente = require('./routes/cliente');
-
+var evento = require('./routes/evento');
 //Midelwares
 
 app.use(bodyParser.urlencoded({extended:false}));
@@ -31,6 +31,7 @@ app.use((req, res, next) => {
 // Añadir prefijos a rutas /cargar rutas
 app.use('/',article_router);
 app.use('/',article_cliente);
+app.use('/',evento);
 
 //rutas o metodo de prueba para el API REST
 /** 

@@ -63,20 +63,22 @@ var controller = {
         try {
             var validateTitle = !validator.isEmpty(params.title);
             var validate_cotent = !validator.isEmpty(params.content);
+            var validate_stock = validator.isFloat(params.stock);
+            var validate_precio = validator.isFloat(params.precio);
         } catch (err) {
-            status: 'error'
+           console.log("entra en catch")
             return res.status(200).send({
-                message: 'Faltan datos por enviar!!'
+                message: 'Datos No validos!!'
             });
         }
 
-        if (validateTitle && validate_cotent) {
+        if (validateTitle && validate_cotent && validate_stock && validate_precio) {
             //crear el objeto a guardar
             var article = new Article();
             article.title = params.title;
             article.precio = params.precio;
             article.content = params.content;
-
+        
             article.imagen = null;
             article.categoria=params.categoria;
             article.stock=params.stock;
@@ -95,12 +97,15 @@ var controller = {
                 //devolver una respuesta
                 return res.status(200).send({
                     status: 'success',
-                    article: articleStore
+                    article: articleStore,
+                    message:'El Articulo se ha guardado correctamente!!'
                 });
             });
 
         } else {
+            console.log("Los datos no son validos!!")
             return res.status(200).send({
+               
                 status: 'error',
                 message: 'Los datos no son validos!!'
             });

@@ -39,9 +39,9 @@ var controller = {
         try {
             var validateNombre = !validator.isEmpty(params.nombre);
             var validate_apellido = !validator.isEmpty(params.apellido);
-            var validate_telefono = !validator.isEmpty(params.telefono);
+            var validate_telefono = validator.isMobilePhone (params.telefono,'sk-SK', 'sr-RS');
             var validate_direccion = !validator.isEmpty(params.direccion);
-            var validate_email = !validator.isEmpty(params.email);
+            var validate_email = validator.isEmail(params.email);
             var validate_dni = !validator.isEmpty(params.dni);
             var validate_password = !validator.isEmpty(params.password);
             var validate_rol = !validator.isEmpty(params.rol);
@@ -215,6 +215,7 @@ console.log(clienteId+"IDD")
                 { "dni": { "$regex": searchstring, "$options": "i" } },
                 { "direccion": { "$regex": searchstring, "$options": "i" } },
                 { "email": { "$regex": searchstring, "$options": "i" } },
+                { "rol": { "$regex": searchstring, "$options": "i" } },
 
             ]
         }).sort([['date', 'descending']]).exec((err, clientes) => {
